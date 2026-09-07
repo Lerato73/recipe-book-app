@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recipe Book</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
+body{background:#dde1c7;display:flex;justify-content:center;align-items:center;height:100vh;}
+.phone{width:360px;height:620px;background:#fffef5;border-radius:26px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 10px 30px rgba(0,0,0,0.15);position:relative;}
+header{background:#ff3d20;padding:14px;}header h1{font-size:16px;font-weight:800;color:#000;}header p{font-size:10px;opacity:0.7;margin-bottom:8px;}
+.search{background:white;border-radius:20px;padding:9px 12px;display:flex;gap:6px;} .search input{border:none;outline:none;font-size:11px;width:100%;}
+.row{display:flex;gap:8px;margin-top:8px;} .dropdown{flex:1;background:white;border-radius:20px;padding:7px 10px;font-size:10px;font-weight:700;position:relative;} .dropdown select{position:absolute;inset:0;opacity:0;}
+
+#list{flex:1;padding:10px;display:grid;grid-template-columns:1fr 1fr;gap:10px;overflow-y:auto;background:#fffef5;}
+.card{background:white;border-radius:18px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.07);cursor:pointer;position:relative;}
+.img-wrap{position:relative;} .img-wrap img{width:100%;height:105px;object-fit:cover;}
+.badge{position:absolute;top:8px;left:8px;background:#ffda2a;font-size:7px;font-weight:900;padding:3px 6px;border-radius:10px;z-index:2;}
+.heart{position:absolute;top:8px;right:8px;background:white;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;z-index:3;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,0.2);}
+.heart.liked{background:#ff4a4a;color:white;}
+.info{padding:7px;} .info h3{font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.meta{display:flex;gap:4px;margin-top:4px;} .tag{font-size:7px;background:#eee;padding:2px 5px;border-radius:10px;} .time{font-size:7px;background:#fff3a3;padding:2px 5px;border-radius:10px;font-weight:700;}
+
+/* RECIPE DETAIL MODAL - CLICKABLE */
+#detail{position:absolute;inset:0;background:#fffef5;z-index:10;display:none;flex-direction:column;overflow-y:auto;}
+#detail.show{display:flex;}
+.detail-top{position:relative;} .detail-top img{width:100%;height:180px;object-fit:cover;}
+.back{position:absolute;top:12px;left:12px;background:white;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,0.2);}
+.detail-body{padding:14px;}
+.detail-body h2{font-size:14px;margin-bottom:6px;}
+.detail-body .pills{display:flex;gap:6px;margin-bottom:10px;}
+.ing{font-size:11px;background:white;padding:8px;border-radius:10px;margin-bottom:10px;}
+.ing h4{font-size:11px;margin-bottom:4px;}
+.ing li{font-size:10px;margin-left:14px;margin-bottom:2px;}
+.instr{font-size:10px;line-height:15px;background:white;padding:10px;border-radius:10px;}
+
+.bottom-nav{height:60px;background:white;display:flex;justify-content:space-around;align-items:center;border-top:1px solid #eee;flex-shrink:0;}
+.bottom-nav a{font-size:8px;color:#bbb;text-decoration:none;text-align:center;} .bottom-nav a.active{color:#000;font-weight:bold;}
+.add-btn{background:#f2aeb0;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white!important;}
+</style>
+</head>
+<body>
+<div class="phone">
+<header><h1>Recipe Book 🔍</h1><p>What's cooking today?</p><div class="search">🔍 <input id="searchInput" placeholder="Search meals..."></div>
+<div class="row"><div class="dropdown">All ▼<select id="catSelect"><option value="All">All</option><option value="Beef">Beef</option><option value="Chicken">Chicken</option><option value="Seafood">Seafood</option><option value="Dessert">Dessert</option></select></div><div class="dropdown">Cooking Time ▼<select id="timeSelect"><option value="All">All</option><option value="30">Under 30m</option><option value="45">Under 45m</option></select></div></div></header>
+
+<div id="list"></div>
+
+<!-- DETAIL VIEW -->
+<div id="detail">
+<div class="detail-top"><img id="dImg"><div class="back" onclick="closeDetail()">←</div></div>
+<div class="detail-body">
+<h2 id="dTitle"></h2>
+<div class="pills"><span id="dCat" class="tag"></span><span id="dTime" class="time"></span><span id="dLabel" class="tag" style="background:#ffda2a;font-weight:800;"></span></div>
+<div class="ing"><h4>🛒 Ingredients</h4><ul id="dIng"></ul></div>
+<div class="ing"><h4>👩‍🍳 Instructions</h4><div id="dInstr" class="instr"></div></div>
+</div>
+</div>
+
+<nav class="bottom-nav"><a class="active">🏠<br>Home</a><a href="favorites.html">❤️<br>Fav</a><a class="add-btn">+</a><a href="profile.html">👤<br>Profile</a><a href="settings.html">⚙️<br>Settings</a></nav>
+</div>
+
+<script>
+let allMeals=[];
+let favorites=JSON.parse(localStorage.getItem('favs')||'[]');
+
+// 1. YOUR MEAL - WITH FULL RECIPE
+const myMeal={
+  idMeal:"my1", isMine:true,
+  strMeal:"My Special Beef Pie",
+  strMealThumb:"https://images.unsplash.com/photo-1608897013039-887f21d8c804?w=500",
+  strCategory:"My Meal", time:45,
+  ingredients:["500g beef mince","1 onion chopped","2 carrots diced","1 cup beef stock","Pastry sheets","Salt & pepper"],
+  instructions:"1. Brown mince and onion in pan.\n2. Add carrots and beef stock, simmer 20min until thick.\n3. Place filling in pie dish, cover with pastry.\n4. Bake at 180°C for 25min until golden.\n5. Serve hot with veggies."
+};
+
+function render(data){
+ document.getElementById('list').innerHTML=data.map((m,i)=>`
+ <div class="card" onclick="openDetail('${m.idMeal}')">
+  <div class="img-wrap"><img src="${m.strMealThumb}">${m.isMine?'<div class="badge">MY MEAL</div>':''}<div class="heart ${favorites.includes(m.idMeal)?'liked':''}" data-id="${m.idMeal}" onclick="event.stopPropagation();toggleHeart(this)">${favorites.includes(m.idMeal)?'❤️':'🤍'}</div></div>
+  <div class="info"><h3>${m.strMeal}</h3><div class="meta"><span class="tag">${m.isMine?'Homemade':'MealDB'}</span><span class="time">⏱ ${m.time}m</span></div></div>
+ </div>`).join('');
+}
+
+function load(){
+ fetch('https://www.themealdb.com/api/json/v1/1/search.php?s=').then(r=>r.json()).then(d=>{
+  const api = d.meals.slice(0,7).map(x=>({...x, time:Math.floor(Math.random()*35)+15, isMine:false}));
+  allMeals=[myMeal, ...api];
+  render(allMeals);
+ });
+}
+load();
+
+function toggleHeart(el){
+ const id=el.dataset.id;
+ if(favorites.includes(id)){ favorites=favorites.filter(f=>f!==id); el.classList.remove('liked'); el.innerText='🤍'; }
+ else{ favorites.push(id); el.classList.add('liked'); el.innerText='❤️'; }
+ localStorage.setItem('favs',JSON.stringify(favorites));
+}
+
+async function openDetail(id){
+ const meal = allMeals.find(m=>m.idMeal===id);
+ document.getElementById('detail').classList.add('show');
+ document.getElementById('dImg').src=meal.strMealThumb;
+ document.getElementById('dTitle').innerText=meal.strMeal;
+ document.getElementById('dCat').innerText=meal.strCategory;
+ document.getElementById('dTime').innerText='⏱ '+meal.time+'m';
+ document.getElementById('dLabel').innerText=meal.isMine?'MY MEAL':'FROM MEALDB';
+
+ if(meal.isMine){
+   document.getElementById('dIng').innerHTML=meal.ingredients.map(i=>`<li>${i}</li>`).join('');
+   document.getElementById('dInstr').innerText=meal.instructions;
+ } else {
+   // FETCH REAL INGREDIENTS FROM MEALDB
+   const res=await fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${id}`).then(r=>r.json());
+   const m=res.meals[0];
+   let ingHtml='';
+   for(let i=1;i<=20;i++){ if(m[`strIngredient${i}`]){ ingHtml+=`<li>${m[`strIngredient${i}`]} - ${m[`strMeasure${i}`]}</li>`; } }
+   document.getElementById('dIng').innerHTML=ingHtml;
+   document.getElementById('dInstr').innerText=m.strInstructions;
+ }
+}
+function closeDetail(){ document.getElementById('detail').classList.remove('show'); }
+</script>
+</body>
+</html>
