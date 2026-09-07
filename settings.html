@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Settings - Recipe Book</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+body{background:#dde1c7;display:flex;justify-content:center;align-items:center;min-height:100vh;transition:.3s}
+.phone{width:360px;height:650px;background:#fffef5;border-radius:26px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 10px 30px rgba(0,0,0,.15)}
+header{background:#ff3d20;padding:18px}
+header h2{color:#000;font-size:16px;font-weight:900}
+.content{flex:1;padding:12px;overflow-y:auto;background:#fffef5}
+.card{background:#fff;border-radius:14px;padding:12px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.left{display:flex;gap:10px;align-items:center}
+.card p{font-size:12px;font-weight:700}
+.card small{font-size:9px;color:#888}
+.toggle{width:40px;height:22px;background:#ddd;border-radius:11px;position:relative;cursor:pointer}
+.toggle.on{background:#4caf50}
+.toggle::after{content:'';position:absolute;width:18px;height:18px;background:#fff;border-radius:50%;top:2px;left:2px;transition:.3s}
+.toggle.on::after{left:20px}
+.btn{font-size:10px;padding:6px 12px;border-radius:20px;border:1px solid #ddd;background:#fff;cursor:pointer;font-weight:700}
+.bottom-nav{height:62px;background:#fff;display:flex;justify-content:space-around;align-items:center;border-top:1px solid #eee}
+.bottom-nav a{font-size:8px;color:#bbb;text-decoration:none;text-align:center;display:flex;flex-direction:column;align-items:center}
+.bottom-nav a.active{color:#ff3d20;font-weight:900}
+.add-btn{background:#f2aeb0;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff!important;font-size:18px!important}
+body.dark{background:#1a1a1a}
+body.dark .phone, body.dark .content{background:#2b2b2b}
+body.dark .card{background:#3a3a3a;color:#fff}
+</style>
+</head>
+<body>
+<div class="phone">
+<header><h2>Settings</h2></header>
+<div class="content">
+<div class="card" onclick="toggleNoti()"><div class="left">🔔<div><p>Notifications</p><small>Recipe updates</small></div></div><div class="toggle on" id="notiToggle"></div></div>
+<div class="card" onclick="toggleDark()"><div class="left">🌙<div><p>Dark Mode</p><small>Toggle theme</small></div></div><div class="toggle" id="darkToggle"></div></div>
+<div class="card"><div class="left">📏<div><p>Measurement</p><small id="measureText">Metric (g, ml)</small></div></div><button class="btn" onclick="changeMeasure()">Change</button></div>
+<div class="card"><div class="left">❓<div><p>Help & Support</p><small>FAQs, Contact</small></div></div><button class="btn" onclick="openHelp()">Open</button></div>
+<div class="card"><div class="left">🔒<div><p>Privacy Policy</p><small>View policy</small></div></div><button class="btn" onclick="openPrivacy()">View</button></div>
+<div class="card"><div class="left">ℹ️<div><p>About</p><small>Version 1.0</small></div></div><button class="btn" onclick="openAbout()">Info</button></div>
+</div>
+<nav class="bottom-nav">
+<a href="index.html">🏠<br>Home</a><a href="#">❤️<br>Fav</a><a href="#" class="add-btn">+</a><a href="#">👤<br>Profile</a><a class="active">⚙️<br>Settings</a>
+</nav>
+</div>
+<script>
+function toggleNoti(){let t=document.getElementById('notiToggle');t.classList.toggle('on');alert(t.classList.contains('on')?'Notifications ENABLED':'DISABLED');localStorage.setItem('noti',t.classList.contains('on'))}
+function toggleDark(){let t=document.getElementById('darkToggle');t.classList.toggle('on');document.body.classList.toggle('dark');localStorage.setItem('dark',document.body.classList.contains('dark'))}
+function changeMeasure(){let e=document.getElementById('measureText');e.innerText=e.innerText.includes('Metric')?'Imperial (oz, cups)':'Metric (g, ml)';alert('Changed to '+e.innerText);localStorage.setItem('measure',e.innerText)}
+function openHelp(){alert('HELP & SUPPORT\n\n• Add recipe: Tap + button\n• Favorite: Tap heart\n• Contact: support@recipebook.com')}
+function openPrivacy(){alert('PRIVACY POLICY\n\nYour data is safe. Favorites saved locally only.')}
+function openAbout(){alert('RECIPE BOOK v1.0\nBuilt with TheMealDB API\nFor IIE Final Project')}
+</script>
+</body>
+</html>
