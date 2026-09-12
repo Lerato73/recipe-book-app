@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Profile</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', sans-serif }
+html, body { height:100%; overflow:hidden; }
+body { background:#F5F5F5; display:flex; justify-content:center; align-items:center; }
+.phone{ width:100%; max-width:380px; height:100vh; max-height:680px; background:white; display:flex; flex-direction:column; overflow:hidden; border-radius:20px; box-shadow:0 0 20px rgba(0,0,0,0.08); }
+.top{ background:#FF9B2F; padding:16px; flex-shrink:0; }
+.top h2{font-size:18px;font-weight:900}.top p{font-size:11px;margin:2px 0 0;opacity:0.9}
+.content{ flex:1; overflow-y:auto; background:#FAFAFA; scrollbar-width:none; padding:14px}
+.content::-webkit-scrollbar{display:none}
+.card{background:white;border-radius:16px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.06);text-align:center}
+.avatar-wrap{position:relative;width:84px;height:84px;margin:0 auto 10px}
+.avatar{width:84px;height:84px;border-radius:50%;display:block;object-fit:cover;border:3px solid #FF9B2F}
+.edit-pic{position:absolute;right:-4px;bottom:-2px;width:26px;height:26px;background:#2E3A59;color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;border:2px solid white}
+.bio{background:#FFF7E0;border-radius:12px;padding:10px;font-size:11px;color:#666;margin:12px 0;line-height:14px}
+.stats{display:flex;justify-content:space-around;margin:16px 0}
+.stat{cursor:pointer;padding:6px;border-radius:10px}.stat:hover{background:#FFF7E0}
+.stats b{display:block;font-size:16px}.stats span{font-size:10px;color:#888}
+.btn{width:100%;background:#2E3A59;color:white;border:none;padding:12px;border-radius:14px;font-weight:700;margin-top:10px;cursor:pointer}
+.btn.ghost{background:white;color:#2E3A59;border:1px solid #ddd;margin-top:8px}
+.btn.logout{background:#FFE9E9;color:#D32F2F;border:1px solid #FFCDCD;margin-top:12px}
+.list{margin-top:14px;text-align:left}
+.list button{width:100%;background:white;border:1px solid #eee;padding:12px;border-radius:12px;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:12px;font-weight:600;cursor:pointer}
+.nav{display:flex;justify-content:space-around;align-items:center;padding:10px 0;background:white;border-top:1px solid #eee;flex-shrink:0}
+.nav a{text-decoration:none;text-align:center;font-size:9px;color:#888;line-height:12px}
+.nav a.active{color:#111;font-weight:700}
+.nav.plus{width:38px;height:38px;background:#FFC727;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;color:#111;font-weight:900}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);align-items:center;justify-content:center;z-index:10}
+.modal.show{display:flex}
+.box{background:white;width:90%;max-width:320px;border-radius:16px;padding:16px}
+.box input,.box textarea{width:100%;padding:10px;border-radius:10px;border:1px solid #ddd;margin-top:8px;font-size:12px}
+.box textarea{height:60px;resize:none}
+.row{display:flex;gap:8px;margin-top:12px}
+.row button{flex:1;padding:10px;border-radius:10px;border:none;font-weight:700;cursor:pointer}
+.save{background:#FFC727}.cancel{background:#eee}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="top">
+    <h2>Profile 👤</h2>
+    <p>Your cooking journey</p>
+  </div>
+
+  <div class="content">
+    <div class="card">
+      <div class="avatar-wrap">
+        <img class="avatar" id="avatar" src="https://i.pravatar.cc/150?img=5">
+        <div class="edit-pic" onclick="document.getElementById('file').click()">✏️</div>
+      </div>
+      <input type="file" id="file" hidden accept="image/*">
+
+      <h3 id="pName" style="font-size:15px">Chef Joy</h3>
+      <p id="pEmail" style="font-size:10px;color:#999;margin:2px 0 0">joy@recipebook.com</p>
+      <div class="bio" id="pBio">Passionate home chef 👩‍🍳 Love seafood & desserts<br>Cooking is my happy place.</div>
+
+      <div class="stats">
+        <div class="stat" onclick="location.href='index.html'"><b id="myMealsCount">0</b><span>My Meals</span></div>
+        <div class="stat" onclick="location.href='favorites.html'"><b id="favCount">0</b><span>Favorites</span></div>
+        <div class="stat"><b>48</b><span>Cooked</span></div>
+      </div>
+
+      <button class="btn" onclick="openEdit()">✏️ Edit Profile</button>
+
+      <div class="list">
+        <button onclick="location.href='index.html'">📚 My Recipes <span>›</span></button>
+        <button onclick="location.href='favorites.html'">❤️ Favorite Meals <span id="favCount2"></span> <span>›</span></button>
+        <button onclick="location.href='settings.html'">⚙️ Account Settings <span>›</span></button>
+      </div>
+
+      <button class="btn ghost" onclick="browseGuest()">👀 Browse as Guest</button>
+      <button class="btn logout" onclick="logOut()">🚪 Log Out</button>
+    </div>
+  </div>
+
+  <div class="nav">
+    <a href="index.html">🏠<br>Home</a>
+    <a href="favorites.html">⭐<br>Fav</a>
+    <a href="add.html" class="plus">+</a>
+    <a href="profile.html" class="active">👤<br>Profile</a>
+    <a href="settings.html">⚙️<br>Settings</a>
+  </div>
+</div>
+
+<div class="modal" id="modal">
+  <div class="box">
+    <h3 style="font-size:14px">Edit Profile</h3>
+    <input id="eName" placeholder="Name">
+    <input id="eEmail" placeholder="Email">
+    <textarea id="eBio" placeholder="Bio"></textarea>
+    <div class="row">
+      <button class="cancel" onclick="closeEdit()">Cancel</button>
+      <button class="save" onclick="saveProfile()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function loadAll(){
+  const p=JSON.parse(localStorage.getItem('profile')||'{}');
+  if(p.name) document.getElementById('pName').textContent=p.name;
+  if(p.email) document.getElementById('pEmail').textContent=p.email;
+  if(p.bio) document.getElementById('pBio').innerHTML=p.bio;
+  if(p.avatar) document.getElementById('avatar').src=p.avatar;
+
+  if(localStorage.getItem('guest')==='true'){
+    document.getElementById('pName').textContent='Guest Chef';
+    document.getElementById('pEmail').textContent='Browsing as guest';
+  }
+
+  // FIX FAVORITES COUNT - counts real favorites
+  const custom=JSON.parse(localStorage.getItem('custom_meals')||'[]').length;
+  const fav=JSON.parse(localStorage.getItem('favorites')||'[]');
+  document.getElementById('myMealsCount').textContent=custom;
+  document.getElementById('favCount').textContent=fav.length;
+  document.getElementById('favCount2').textContent=fav.length>0?`(${fav.length})`:'';
+}
+loadAll();
+
+function openEdit(){ document.getElementById('eName').value=document.getElementById('pName').textContent; document.getElementById('eEmail').value=document.getElementById('pEmail').textContent; document.getElementById('eBio').value=document.getElementById('pBio').innerText; document.getElementById('modal').classList.add('show'); }
+function closeEdit(){ document.getElementById('modal').classList.remove('show'); }
+function saveProfile(){
+  const data={ name:document.getElementById('eName').value, email:document.getElementById('eEmail').value, bio:document.getElementById('eBio').value, avatar:document.getElementById('avatar').src };
+  localStorage.setItem('profile',JSON.stringify(data));
+  localStorage.removeItem('guest');
+  loadAll(); closeEdit(); alert('Profile saved ✅');
+}
+function browseGuest(){
+  localStorage.setItem('guest','true');
+  alert('Browsing as Guest 👀 - You can still view recipes');
+  loadAll();
+  location.href='index.html';
+}
+function logOut(){
+  if(confirm('Log out? Your recipes will stay, but you will browse as Guest.')){
+    localStorage.setItem('guest','true');
+    alert('Logged out! You are now Guest');
+    location.href='index.html';
+  }
+}
+document.getElementById('file').addEventListener('change',e=>{
+  const r=new FileReader();
+  r.onload=()=>{ document.getElementById('avatar').src=r.result; localStorage.setItem('profile',JSON.stringify({...JSON.parse(localStorage.getItem('profile')||'{}'), avatar:r.result})); }
+  r.readAsDataURL(e.target.files[0]);
+});
+</script>
+</body>
+</html>
